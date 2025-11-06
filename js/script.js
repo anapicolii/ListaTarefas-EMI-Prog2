@@ -1,8 +1,24 @@
 // Array global para armazenar os objetos de tarefa
-let listaTarefas = [];
+// tenta carregar as tarefas do localStorage
+let listaTarefas = JSON.parse(localStorage.getItem("lista_tarefas")) || [];
 
-// Vanessa: erro da última aula: linha abaixo estava chamando localStorage.getItem("lista-disciplinas")
-let listaDisciplinas = JSON.parse(localStorage.getItem("lista-disciplina")) || [];
+//caso existam tarefas salvas, recontroi como objetos Tarefa ou TarefaEscolar
+listaTarefas = listaTarefas.map(t => {
+    //se o objeto tem propriedade 'disciplina', é taredfaEscolar
+    if(t.disciplina){
+        //recontroi a disiciplina
+        let disc = new Disciplina(t.disciplina.nome, t.disciplina.sigla);
+        return new TarefaEscolar(
+            t.nome, t.descricao, t.data, disc, t.data_entrega, t.sistema_entrega, t.peso_atividade
+        );
+    } else {
+        return new Tarefa(t.nome, t.descricao, t.data);
+    }
+});
+
+if(listaTarefas.length > 0){
+    carregarTarefas();
+}
 
 if(listaDisciplinas.length > 0){
     listaDisciplinas = listaDisciplinas.map(d => new Disciplina(d.nome, d.sigla));
@@ -77,6 +93,7 @@ function cadastrarTarefa(evento) {
 
     // b. Adicione o objeto criado ao array 'listaTarefas'.
     listaTarefas.push(obj_tarefa);
+    localStorage.setItem("lista_tarefas", JSON.stringify(listaTarefas));
 
     // c. Chame a função 'carregarTarefas()' para atualizar a lista na tela.
     carregarTarefas();
